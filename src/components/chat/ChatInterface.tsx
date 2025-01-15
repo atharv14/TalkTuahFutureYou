@@ -8,13 +8,15 @@ import useAppStore from '@/lib/store/appStore';
 import { generateChatResponse } from '@/lib/api/futurePersona';
 import { ChatMessage } from '@/types/chat';
 import { useNavigate } from 'react-router-dom';
+import TimelineVisualizer from '../timeline/TimelineVisualizer';
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isTimelineVisible, setIsTimelineVisible] = useState(false);
   const { userProfile, reset } = useAppStore();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const handleReset = () => {
@@ -66,100 +68,118 @@ const ChatInterface: React.FC = () => {
       const response = await generateChatResponse(inputMessage, {
         answers: userProfile.answers,
         futurePersona: userProfile.futurePersona
-        });
+      });
 
-    const futureMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      content: response,
-      sender: 'future-self',
-      timestamp: new Date(),
-    };
+      // Check if message is related to financial projections
+      if (inputMessage.toLowerCase().includes('show') &&
+        (inputMessage.toLowerCase().includes('projection') ||
+          inputMessage.toLowerCase().includes('timeline'))) {
+        setIsTimelineVisible(true);
+      }
 
-    setMessages(prev => [...prev, futureMessage]);
-  } catch (error) {
-    console.error('Error generating response:', error);
-    setMessages(prev => [...prev, {
-      id: (Date.now() + 1).toString(),
-      content: "I'm having trouble connecting right now. Please try again.",
-      sender: 'future-self',
-      timestamp: new Date(),
-    }]);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const futureMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: response,
+        sender: 'future-self',
+        timestamp: new Date(),
+      };
 
-return (
-  <div className="flex flex-col fixed inset-0">
-    {/* Fixed Header */}
-    <div className="border-b p-4 flex justify-between items-center bg-background">
-      <h1 className="font-bold">Chat with Future Self</h1>
-      <Button variant="outline" onClick={handleReset}>
-        Start Over
-      </Button>
-    </div>
+      setMessages(prev => [...prev, futureMessage]);
+    } catch (error) {
+      console.error('Error generating response:', error);
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        content: "I'm having trouble connecting right now. Please try again.",
+        sender: 'future-self',
+        timestamp: new Date(),
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    {/* Chat Area - fills remaining space with scroll */}
-    <div className="flex-1 overflow-hidden relative">
-      <div 
-        className="absolute inset-0 overflow-y-auto p-4"
-        ref={scrollAreaRef}
-      >
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <div className="flex items-start gap-2 max-w-[80%]">
-                {message.sender === 'future-self' && (
-                  <Avatar>
-                    <AvatarFallback>FS</AvatarFallback>
-                  </Avatar>
-                )}
-                <div
-                  className={`rounded-lg p-3 ${
-                    message.sender === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
-                  {message.content}
-                </div>
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex items-center gap-2 rounded-lg p-3 bg-muted">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Thinking...
-              </div>
-            </div>
-          )}
+  return (
+    <div className="flex flex-col fixed inset-0">
+      {/* Fixed Header */}
+      <div className="border-b p-4 flex justify-between items-center bg-background">
+        <h1 className="font-bold">TalkTuahFutureYou</h1>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsTimelineVisible(!isTimelineVisible)}
+          >
+            {isTimelineVisible ? 'Hide Timeline' : 'Show Timeline'}
+          </Button>
+          <Button variant="outline" onClick={handleReset}>
+            Start Over
+          </Button>
         </div>
       </div>
-    </div>
 
-    {/* Fixed Input Area */}
-    <div className="border-t p-4 bg-background">
-      <form onSubmit={handleSendMessage} className="flex gap-2">
-        <Input
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Ask your future self something..."
-          disabled={isLoading}
-          className="flex-1"
-        />
-        <Button type="submit" disabled={isLoading}>
-          Send
-        </Button>
-      </form>
+      {/* Chat Area - fills remaining space with scroll */}
+      <div className="flex-1 overflow-hidden relative">
+        <div
+          className="absolute inset-0 overflow-y-auto p-4"
+          ref={scrollAreaRef}
+        >
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
+              >
+                <div className="flex items-start gap-2 max-w-[80%]">
+                  {message.sender === 'future-self' && (
+                    <Avatar>
+                      <AvatarFallback>FS</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div
+                    className={`rounded-lg p-3 ${message.sender === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                      }`}
+                  >
+                    {message.content}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-center gap-2 rounded-lg p-3 bg-muted">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Mesmerizing...
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Fixed Input Area */}
+      <div className="border-t p-4 bg-background">
+        <form onSubmit={handleSendMessage} className="flex gap-2">
+          <Input
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Ask your future self something..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button type="submit" disabled={isLoading}>
+            Send
+          </Button>
+        </form>
+      </div>
+      <TimelineVisualizer
+        isVisible={isTimelineVisible}
+        onClose={() => setIsTimelineVisible(false)}
+      />
+
     </div>
-  </div>
-);
+  );
 };
 
 export default ChatInterface;

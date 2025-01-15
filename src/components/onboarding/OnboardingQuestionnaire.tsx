@@ -14,6 +14,7 @@ import OnboardingProgress from './OnboardingProgress';
 import AnimatedQuestion from './AnimatedQuestion';
 import { Loader2 } from "lucide-react";
 import { useToast } from '@/components/ui/use-toast';
+import { generateDefaultScenario } from '@/lib/utils/timeline';
 
 const OnboardingQuestionnaire: React.FC = () => {
     // State Management
@@ -24,7 +25,7 @@ const OnboardingQuestionnaire: React.FC = () => {
 
     // Hooks
     const { toast } = useToast();
-    const { updateAnswers, setOnboarded, updateFuturePersona } = useAppStore();
+    const { updateAnswers, setOnboarded, updateFuturePersona, setUserProfile } = useAppStore();
 
     // Current Question Setup
     const currentQuestion = questions[currentQuestionIndex];
@@ -64,8 +65,27 @@ const OnboardingQuestionnaire: React.FC = () => {
         try {
             const persona = await generateFuturePersona(answers);
 
+            // Generate initial timeline scenario
+            const defaultScenario = generateDefaultScenario(answers);
+            console.log('Generated Default Scenario:', defaultScenario);
+
+            const initialTimeline = {
+                scenarios: [defaultScenario],
+                activeScenarioId: defaultScenario.id,
+                comparisonScenarioId: null,
+                timeRange: '5years' as const
+            };
+
             updateAnswers(answers);
             updateFuturePersona(persona);
+
+            const newProfile = {
+                answers,
+                futurePersona: persona,
+                timeline: initialTimeline
+            };
+
+            setUserProfile(newProfile);
             setOnboarded(true);
 
             toast({
@@ -81,7 +101,7 @@ const OnboardingQuestionnaire: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [validateAnswer, answers, updateAnswers, updateFuturePersona, setOnboarded, toast]);
+    }, [validateAnswer, answers, updateAnswers, updateFuturePersona, setOnboarded, setUserProfile, toast]);
 
     const handleNext = useCallback(() => {
         if (!validateAnswer()) return;
