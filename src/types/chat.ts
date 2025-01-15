@@ -5,6 +5,11 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
+export interface ChatCompletionMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 export interface FuturePersona {
   personality: string;
   achievedGoals: string[];

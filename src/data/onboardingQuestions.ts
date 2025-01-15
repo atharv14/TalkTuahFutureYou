@@ -3,6 +3,13 @@ import { OnboardingQuestion } from '@/types/onboarding';
 
 export const questions: OnboardingQuestion[] = [
   {
+    id: 'user_name',
+    type: 'text',
+    question: "What's your first name?",
+    description: "This helps personalize your future self's advice",
+    required: true
+  },
+  {
     id: 'financial_goals',
     type: 'multiple',
     question: 'What are your top financial goals?',
