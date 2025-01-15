@@ -186,7 +186,10 @@ const OnboardingQuestionnaire: React.FC = () => {
     }, [currentQuestion, currentAnswer, handleAnswer]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-800 p-4">
+            {/* <div className="flex items-start justify-center h-screen"> */}
+                <span className="mb-6 text-4xl font-bold">TalkTuahFutureYou</span>
+            
             <Card className="w-full max-w-2xl">
                 <CardHeader>
                     <CardTitle className="text-center">Shape Your Financial Future</CardTitle>
@@ -228,6 +231,7 @@ const OnboardingQuestionnaire: React.FC = () => {
                     </div>
                 </CardContent>
             </Card>
+            {/* </div> */}
         </div>
     );
 };

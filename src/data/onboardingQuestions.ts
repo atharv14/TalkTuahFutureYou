@@ -6,7 +6,7 @@ export const questions: OnboardingQuestion[] = [
     id: 'user_name',
     type: 'text',
     question: "What's your first name?",
-    description: "This helps personalize your future self's advice",
+    description: "This helps find future you",
     required: true
   },
   {

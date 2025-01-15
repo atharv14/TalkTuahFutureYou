@@ -120,14 +120,17 @@ const ChatInterface: React.FC = () => {
     }
   };
 
+  const userName = userProfile?.answers.find(a => a.questionId === 'user_name')?.answer || 'S';
+
   return (
-    <div className="flex flex-col fixed inset-0">
+    <div className="flex flex-col fixed inset-0 bg-background">
       {/* Fixed Header */}
-      <div className="border-b p-4 flex justify-between items-center bg-background">
-        <h1 className="font-bold">TalkTuahFutureYou</h1>
+      <div className="border-b p-4 flex justify-between items-center bg-primary/5">
+        <h1 className="font-bold text-primary">TalkTuahFutureYou</h1>
         <div className="flex gap-2">
           <Button
             variant="outline"
+            className='hover:bg-primary/10'
             onClick={() => setIsTimelineVisible(!isTimelineVisible)}
           >
             {isTimelineVisible ? 'Hide Timeline' : 'Show Timeline'}
@@ -139,102 +142,119 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-hidden relative bg-gray-50">
         <div className="absolute inset-0 overflow-y-auto p-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
+          <div className="max-w-3xl mx-auto space-y-4">
             {messages.map(message => (
               <div
                 key={message.id}
-                className={`flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex ${message.sender === 'user'
+                  ? 'justify-end'
+                  : 'justify-start'
+                  }`}
               >
-                <div className="flex items-start gap-2 max-w-[80%]">
-                  {message.sender === 'future-self' && (
-                    <Avatar>
-                      <AvatarFallback>FS</AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div
-                    className={`rounded-lg p-3 ${
-                      message.sender === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted prose prose-sm max-w-none dark:prose-invert'
-                    }`}
-                  >
-                    {message.sender === 'user' ? (
-                      message.content
-                    ) : (
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          p: ({ children }) => <p className="mb-2">{children}</p>,
-                          h3: ({ children }) => (
-                            <h3 className="font-bold mb-2">{children}</h3>
-                          ),
-                          ul: ({ children }) => (
-                            <ul className="list-disc ml-4 mb-2">{children}</ul>
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
+                <div className={`rounded-lg p-3 max-w-[95%] ${message.sender === 'user'
+                  ? 'bg-gray-500 text-white'
+                  : 'bg-muted text-foreground'
+                  }`}>
+                  <div className="flex items-start gap-2 max-w-[95%]">
+                    {message.sender === 'future-self' && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-gray-900 text-white text-sm">
+                          F{userName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      // </div>
                     )}
+                    <div
+                      className={`overflow-hidden rounded-lg p-4 ${message.sender === 'user'
+                        ? 'bg-white text-black'
+                        : 'bg-white shadow-sm border border-gray-200'
+                        }`}
+                    >
+                      {message.sender === 'user' ? (
+                        <p className="whitespace-pre-wrap">{message.content}</p>
+                      ) : (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => (
+                              <p className="whitespace-pre-wrap mb-3 last:mb-0">{children}</p>
+                            ),
+                            h3: ({ children }) => (
+                              <h3 className="font-semibold text-base mb-2">{children}</h3>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-2 rounded-lg p-3 bg-muted">
+                <div className="flex items-center gap-2 text-gray-600 bg-white rounded-lg p-3 shadow-sm border border-gray-200">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Mesmerizing...
+                  <span>Mesmerizing...</span>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-
+      {/* Suggestions */}
       {messages.length <= 1 && (
-      <div className="px-4 py-2 border-t bg-background">
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            className="text-sm"
-            onClick={() => setInputMessage("What will my savings look like?")}
-          >
-            What will my savings look like?
-          </Button>
-          <Button 
-            variant="outline"
-            className="text-sm"
-            onClick={() => setInputMessage("How do I achieve my financial goals faster?")}
-          >
-            How do I achieve my financial goals faster?
-          </Button>
-          <Button 
-            variant="outline"
-            className="text-sm"
-            onClick={() => setInputMessage("What important financial decisions should I make now?")}
-          >
-            What important financial decisions should I make now?
-          </Button>
+        <div className="px-4 py-2 border-t bg-gray-50">
+          <div className="max-w-3xl mx-auto flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="text-sm bg-white hover:bg-gray-50"
+              onClick={() => setInputMessage("What will my savings look like?")}
+            >
+              What will my savings look like?
+            </Button>
+            <Button
+              variant="outline"
+              className="text-sm bg-white hover:bg-gray-50"
+              onClick={() => setInputMessage("Can you show me my financial timeline?")}
+            >
+              Can you show me my financial timeline?
+            </Button>
+            <Button
+              variant="outline"
+              className="text-sm bg-white hover:bg-gray-50"
+              onClick={() => setInputMessage("What important financial decisions should I make now?")}
+            >
+              What important financial decisions should I make now?
+            </Button>
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* Input Area */}
-      <div className="border-t p-4 bg-background">
-        <form onSubmit={handleSendMessage} className="flex gap-2">
+      <div className="border-t bg-white p-4">
+        <form
+          onSubmit={handleSendMessage}
+          className="max-w-2xl mx-auto flex gap-2"
+        >
           <Input
             value={inputMessage}
-            onChange={e => setInputMessage(e.target.value)}
-            placeholder="How can you 10 years from now help you ..."
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Ask future you 10 years from now..."
             disabled={isLoading}
             className="flex-1"
           />
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-gray-600 hover:bg-gray-800 text-white"
+          >
             Send
           </Button>
         </form>

@@ -28,11 +28,17 @@ export const generateFinancialMetrics = ({
     }[timeRange];
 
     // Monthly calculations
-    let currentMonthlyIncome = (income / 12) + additionalIncome;
+    const baseMonthlyIncome = income / 12;
+    let currentMonthlyIncome = baseMonthlyIncome + additionalIncome;
+    console.log('Initial monthly income:', currentMonthlyIncome);
     const monthlySavingsRate = savingsRate / 100;
     const monthlyInvestmentReturn = investmentReturn / 100 / 12;
     const annualIncomeGrowthRate = 0.30;
     const monthlyIncomeGrowthRate = Math.pow(1 + annualIncomeGrowthRate, 1 / 12) - 1;
+
+    // Log for verification
+    console.log('Annual Income:', income);
+    console.log('Monthly Income:', currentMonthlyIncome);
 
     let currentSavings = 0;
     let currentInvestments = 0;
@@ -47,7 +53,7 @@ export const generateFinancialMetrics = ({
             currentInvestments = currentInvestments * (1 + monthlyInvestmentReturn);
             currentMonthlyIncome *= (1 + monthlyIncomeGrowthRate);
         }
-        
+
         // Adjust savings based on debt payment
         const monthlySavings = Math.max(0, (currentMonthlyIncome * monthlySavingsRate) - debtPayment);
         currentSavings += monthlySavings;
@@ -86,7 +92,7 @@ export const generateDefaultScenario = (answers: OnboardingAnswer[], timeRange: 
     // Extract risk tolerance for investment return estimation
     const riskAnswer = answers.find(a => a.questionId === 'risk_tolerance');
     const riskTolerance = Number(riskAnswer?.answer) || 5;
-    const estimatedReturn = 4 + (riskTolerance * 0.8); // 4-12% return based on risk tolerance
+    const estimatedReturn = 3 + (riskTolerance * 0.5); // 3-8% return based on risk tolerance
 
     const defaultScenario: TimelineScenario = {
         id: uuidv4(),
@@ -94,12 +100,12 @@ export const generateDefaultScenario = (answers: OnboardingAnswer[], timeRange: 
         description: 'Your projected financial journey based on current habits',
         metrics: generateFinancialMetrics({
             income: baseIncome,
-            savingsRate: 20, // Default 20% savings rate
+            savingsRate: 15, // Default 20% savings rate
             investmentReturn: estimatedReturn,
             timeRange: timeRange
         }),
         assumptions: {
-            savingsRate: 20,
+            savingsRate: 15,
             investmentReturn: estimatedReturn,
             inflationRate: 2.5
         }
@@ -118,4 +124,8 @@ export const getIncomeFromAnswers = (answers: OnboardingAnswer[]): number => {
         'Over $150,000': 200000
     };
     return incomeMap[incomeAnswer?.answer as string] || 50000;
+};
+
+export const getCurrentMonthlyIncome = (baseIncome: number): number => {
+    return baseIncome / 12;
 };

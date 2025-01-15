@@ -4,6 +4,8 @@ import { OnboardingAnswer } from '@/types/onboarding';
 import { FuturePersona, ChatCompletionMessage } from '@/types/chat';
 import { openai } from './openai';
 import { formatFinancialContext, formatGoalsContext } from '@/lib/utils/formatContext';
+import { formatCurrency, formatIncome } from '../utils/formatters';
+import { getCurrentMonthlyIncome, getIncomeFromAnswers } from '../utils/timeline';
 
 const cleanJsonString = (str: string): string => {
   // Remove Markdown code blocks and any other formatting
@@ -86,8 +88,9 @@ export const generateChatResponse = async (
       : '';
 
     const goalsContext = formatGoalsContext(context.answers);
-
     const userName = context.answers.find(a => a.questionId === 'user_name')?.answer || '';
+    const baseIncome = getIncomeFromAnswers(context.answers);
+    const currentMonthlyIncome = getCurrentMonthlyIncome(baseIncome);
 
     const systemPrompt = `You are ${userName}'s future self from 2034.
 
@@ -96,6 +99,12 @@ export const generateChatResponse = async (
                           - Achieved Goals: ${context.futurePersona.achievedGoals.join(', ')}
                           - Key Milestones: ${context.futurePersona.milestones.join(', ')}
 
+                          ### When discussing income:
+                          - Be explicit about whether amounts are monthly or annual
+                          - Current Annual Income: ${formatCurrency(baseIncome)}
+                          - Current Monthly Income: ${formatCurrency(currentMonthlyIncome)}
+                          - Remember to mention current monthly and future monthly income explicitly
+
                           ${financialContext}
                           ${goalsContext}
 
@@ -103,6 +112,9 @@ export const generateChatResponse = async (
                           1. Address ${userName} by name occasionally to make it personal
                           2. Use markdown formatting for better readability
                           3. Reference specific numbers from their financial data when relevant
+                             - Always specify if amounts are monthly or annual
+                             - Use current monthly income of ${formatCurrency(currentMonthlyIncome)} when discussing present scenarios
+                             - Use timeline projections when discussing future scenarios
                           4. Explain the impact of their current decisions on future outcomes
                           5. Provide emotional support while staying realistic
                           6. Suggest actionable next steps based on their goals and timeline

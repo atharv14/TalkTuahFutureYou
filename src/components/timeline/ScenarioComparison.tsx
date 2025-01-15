@@ -83,6 +83,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({ baseScenario })
                         min={0}
                         max={50}
                         step={1}
+                        // className="py-4"
                     />
                     <span className="text-sm text-muted-foreground">{params.savingsRate}%</span>
                 </div>
@@ -95,7 +96,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({ baseScenario })
                         min={0}
                         max={15}
                         step={0.5}
-                        className="py-4"
+                        // className="py-4"
                     />
                     <span className="text-sm text-muted-foreground">{params.investmentReturn}%</span>
                 </div>
@@ -108,7 +109,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({ baseScenario })
                         min={0}
                         max={5000}
                         step={100}
-                        className="py-4"
+                        // className="py-4"
                     />
                     <span className="text-sm text-muted-foreground">${params.additionalIncome}</span>
                 </div>
@@ -121,7 +122,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({ baseScenario })
                         min={0}
                         max={2000}
                         step={50}
-                        className="py-4"
+                        // className="py-4"
                     />
                     <span className="text-sm text-muted-foreground">${params.debtPayment}</span>
                 </div>
