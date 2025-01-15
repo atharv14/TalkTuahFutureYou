@@ -4,7 +4,7 @@ import { OnboardingAnswer } from '@/types/onboarding';
 import { FuturePersona, ChatCompletionMessage } from '@/types/chat';
 import { openai } from './openai';
 import { formatFinancialContext, formatGoalsContext } from '@/lib/utils/formatContext';
-import { formatCurrency, formatIncome } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 import { getCurrentMonthlyIncome, getIncomeFromAnswers } from '../utils/timeline';
 
 const cleanJsonString = (str: string): string => {

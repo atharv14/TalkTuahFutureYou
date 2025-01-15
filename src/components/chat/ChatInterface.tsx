@@ -119,8 +119,12 @@ const ChatInterface: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  const userName = userProfile?.answers.find(a => a.questionId === 'user_name')?.answer || 'S';
+  const userNameAnswer = userProfile?.answers.find(a => a.questionId === 'user_name')?.answer;
+  const userName = Array.isArray(userNameAnswer)
+    ? userNameAnswer[0]
+    : typeof userNameAnswer === 'string'
+      ? userNameAnswer
+      : '';
 
   return (
     <div className="flex flex-col fixed inset-0 bg-background">
