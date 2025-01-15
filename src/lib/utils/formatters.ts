@@ -19,12 +19,3 @@ export const formatDate = (date: Date, format: string): string => {
       return date.toLocaleDateString();
   }
 };
-
-export const formatIncome = (amount: number, frequency: 'monthly' | 'annual' = 'annual'): string => {
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  });
-  return formatter.format(amount);
-};
